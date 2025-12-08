@@ -1,48 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<title>Comandos para copiar</title>
 <style>
   body {
+    background-color: #121212;
+    color: #e0e0e0;
     font-family: monospace;
     padding: 20px;
-    background: #f4f4f4;
   }
-  .code-box {
-    background: #1e1e1e;
-    color: #e5e5e5;
-    padding: 15px;
-    border-radius: 8px;
-    white-space: pre-wrap;
-    margin-bottom: 10px;
+  h2 {
+    color: #ffffff;
+  }
+  .command-container {
+    background-color: #1e1e1e;
     border: 1px solid #333;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    white-space: pre-wrap;
   }
-  button {
+  .copy-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
     background: #4caf50;
     color: white;
-    padding: 8px 15px;
     border: none;
+    padding: 5px 12px;
     border-radius: 5px;
     cursor: pointer;
     font-size: 14px;
   }
-  button:hover {
+  .copy-btn:hover {
     background: #45a049;
   }
 </style>
 </head>
 <body>
 
-<h3>Copiar comando:</h3>
+<h2>Comandos para copiar</h2>
 
-<div class="code-box" id="cmd">
+<div class="command-container" id="cmd1">
 bash &lt;(curl -s https://raw.githubusercontent.com/cmais/linux/main/atualiza.sh)
+<button class="copy-btn" onclick="copyCommand('cmd1')">Copiar</button>
 </div>
 
-<button onclick="navigator.clipboard.writeText(document.getElementById('cmd').innerText)">
-Copiar
-</button>
+<div class="command-container" id="cmd2">
+comando 1
+<button class="copy-btn" onclick="copyCommand('cmd2')">Copiar</button>
+</div>
+
+<div class="command-container" id="cmd3">
+comando 2
+<button class="copy-btn" onclick="copyCommand('cmd3')">Copiar</button>
+</div>
+
+<div class="command-container" id="cmd4">
+comando 3
+<button class="copy-btn" onclick="copyCommand('cmd4')">Copiar</button>
+</div>
+
+<script>
+function copyCommand(id) {
+  const text = document.getElementById(id).innerText.replace('Copiar','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Comando copiado para a área de transferência!');
+  });
+}
+</script>
 
 </body>
 </html>
-
