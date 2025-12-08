@@ -37,6 +37,33 @@
   .copy-btn:hover {
     background: #45a049;
   }
+
+  /* Modal */
+  .modal {
+    display: none; /* oculto por padrão */
+    position: fixed;
+    z-index: 999;
+    left: 50%;
+    top: 20%;
+    transform: translate(-50%, -50%);
+    background-color: #1e1e1e;
+    padding: 20px 30px;
+    border-radius: 10px;
+    border: 1px solid #444;
+    box-shadow: 0 0 10px #000;
+    color: #fff;
+    font-size: 16px;
+    text-align: center;
+    min-width: 250px;
+  }
+  .modal.show {
+    display: block;
+    animation: fadein 0.3s;
+  }
+  @keyframes fadein {
+    from {opacity: 0; transform: translate(-50%, -30%);}
+    to {opacity: 1; transform: translate(-50%, -50%);}
+  }
 </style>
 </head>
 <body>
@@ -63,11 +90,21 @@ comando 3
 <button class="copy-btn" onclick="copyCommand('cmd4')">Copiar</button>
 </div>
 
+<!-- Modal de confirmação -->
+<div id="copyModal" class="modal">✅ Comando copiado!</div>
+
 <script>
 function copyCommand(id) {
   const text = document.getElementById(id).innerText.replace('Copiar','').trim();
   navigator.clipboard.writeText(text).then(() => {
-    alert('Comando copiado para a área de transferência!');
+    // Mostrar modal
+    const modal = document.getElementById('copyModal');
+    modal.classList.add('show');
+
+    // Fechar modal após 2 segundos
+    setTimeout(() => {
+      modal.classList.remove('show');
+    }, 2000);
   });
 }
 </script>
