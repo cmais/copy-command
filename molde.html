@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Credenciais</title>
+    <style>
+        /* CSS para Estilização e Largura das Colunas */
+        .tabela-credenciais {
+            width: 80%; /* Define uma largura máxima para a tabela */
+            margin: 20px auto; /* Centraliza a tabela na página */
+            table-layout: fixed; /* Fixa as larguras das colunas */
+            border-collapse: collapse; /* Remove o espaço entre as bordas */
+        }
+
+        .tabela-credenciais th, .tabela-credenciais td {
+            padding: 10px;
+            border: 1px solid #aaa;
+            /* Fonte Monoespaçada Padrão da Web para consistência */
+            font-family: 'Courier New', Courier, monospace;
+        }
+
+        .tabela-credenciais th {
+            background-color: #f2f2f2;
+            text-align: center;
+        }
+
+        /* Alarga a primeira coluna para o nome do Aluno (40%) */
+        .tabela-credenciais .coluna-aluno {
+            width: 40%; 
+            text-align: left; /* Alinhamento à esquerda para nomes */
+        }
+
+        /* Define a largura e centraliza as colunas de Login e Senha (30% cada) */
+        .tabela-credenciais th:nth-child(2),
+        .tabela-credenciais th:nth-child(3),
+        .tabela-credenciais td:nth-child(2),
+        .tabela-credenciais td:nth-child(3) {
+            width: 30%; 
+            text-align: center;
+        }
+
+        /* Estilo opcional para as linhas ímpares */
+        .tabela-credenciais tbody tr:nth-child(odd) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Lista de Credenciais dos Alunos</h1>
+
+    <table class="tabela-credenciais">
+        <thead>
+            <tr>
+                <th class="coluna-aluno">Aluno</th>
+                <th>Login</th>
+                <th>Senha</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td class="coluna-aluno">Aluno 01</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 02</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 03</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 04</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 05</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 06</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 07</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 08</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 09</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 10</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 11</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 12</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 13</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 14</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 15</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 16</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 17</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 18</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 19</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 20</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 21</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 22</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 23</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 24</td><td>jpi99999</td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 25</td><td>jpi99999</td><td>password</td></tr>
+        </tbody>
+    </table>
+
+</body>
+</html>
