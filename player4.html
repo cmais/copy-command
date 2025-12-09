@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reprodutor de Vídeo com Seleção de Arquivos (Modo Escuro Polido)</title>
+    <style>
+        /* Reset e Base do Tema Escuro */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #121212; /* Fundo escuro principal */
+            padding: 20px;
+            box-sizing: border-box;
+            color: #E0E0E0; /* Cor do texto padrão (cinza claro) */
+        }
+        .container {
+            text-align: center;
+            background-color: #1E1E1E; /* Fundo do container ligeiramente mais claro que o body */
+            padding: 30px;
+            /* POLIMENTO 3: Aumenta border-radius do container */
+            border-radius: 12px; 
+            /* POLIMENTO 2: Sombra mais escura e proeminente */
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5); 
+            width: 90%;
+            max-width: 700px;
+        }
+        /* POLIMENTO 1: Hierarquia Visual - Título mais forte */
+        h1 {
+            color: #FFFFFF;
+            font-size: 1.8em; 
+            margin-bottom: 25px; 
+        }
+        #video-player {
+            width: 100%;
+            max-height: 60vh;
+            margin-top: 20px;
+            display: none;
+            /* POLIMENTO 3: Aumenta border-radius do player */
+            border-radius: 8px;
+            background-color: #000; 
+        }
+        .file-input-container {
+            margin-top: 15px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .file-input-container label {
+            background-color: #00BFFF; /* Cor de destaque: Azul Claro */
+            color: black; /* Texto nos botões em preto para contraste */
+            padding: 10px 20px;
+            /* POLIMENTO 2: Adiciona transições e sombra para interatividade */
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease; 
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            /* POLIMENTO 3: Aumenta border-radius dos botões */
+            border-radius: 8px; 
+        }
+        .file-input-container label:hover {
+            background-color: #009ACD; /* Um tom de azul ligeiramente mais escuro no hover */
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.4); /* Sombra maior no hover */
+        }
+        /* POLIMENTO 2: Efeito sutil de 'pressionar' */
+        .file-input-container label:active {
+            transform: scale(0.96); 
+        }
+        .file-input-container input[type="file"] {
+            display: none;
+        }
+        /* POLIMENTO 1: Hierarquia Visual - Status em cor de destaque */
+        #status-message {
+            margin-top: 20px;
+            color: #00BFFF; 
+            font-weight: bold; 
+            padding: 10px;
+            /* Acessibilidade ARIA */
+            role: "status";
+            aria-live: "polite";
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Reprodutor de Vídeo com Legenda</h1>
+
+        <div class="file-input-container">
+            <label for="video-input">Selecionar Vídeo</label>
+            <input type="file" id="video-input" accept="video/*">
+
+            <label for="subtitle-input">Selecionar Legenda (.srt)</label>
+            <input type="file" id="subtitle-input" accept=".srt">
+        </div>
+
+        <div id="status-message">Por favor, selecione um arquivo de vídeo e um arquivo de legenda.</div>
+
+        <video id="video-player" controls></video>
+    </div>
+
+    <script>
+        const videoPlayer = document.getElementById('video-player');
+        const videoInput = document.getElementById('video-input');
+        const subtitleInput = document.getElementById('subtitle-input');
+        const statusMessage = document.getElementById('status-message');
+
+        let currentVideoBlobUrl = null;
+        let currentSubtitleBlobUrl = null;
+
+        // Função para carregar vídeo (inclui a verificação de compatibilidade sugerida anteriormente)
+        function loadVideo(file) {
+            // Verificação de compatibilidade (para melhorar feedback de erro)
+            if (videoPlayer.canPlayType(file.type) === '') {
+                updateStatus(`Erro: O formato do vídeo "${file.name}" não é suportado pelo seu navegador. Use MP4 (H.264) ou WebM (VP9).`);
+                videoPlayer.style.display = 'none'; 
+                return; 
+            }
+
+            if (currentVideoBlobUrl) {
+                URL.revokeObjectURL(currentVideoBlobUrl);
+            }
+            const videoURL = URL.createObjectURL(file);
+            videoPlayer.src = videoURL;
+            currentVideoBlobUrl = videoURL;
+            videoPlayer.style.display = 'block';
+            updateStatus(`Vídeo "${file.name}" carregado. Adicione a legenda.`);
+            checkIfReadyToPlay();
+        }
+
+        // Função para carregar legenda (inclui a conversão robusta de SRT para VTT)
+        function loadSubtitle(file) {
+            if (currentSubtitleBlobUrl) {
+                URL.revokeObjectURL(currentSubtitleBlobUrl);
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let srtContent = e.target.result;
+
+                const oldTracks = videoPlayer.querySelectorAll('track');
+                oldTracks.forEach(track => track.remove());
+
+                // Conversão robusta de SRT (vírgula) para VTT (ponto)
+                srtContent = srtContent.replace(/\r\n/g, '\n'); 
+                const vttContent = "WEBVTT\n\n" + srtContent.replace(/(\d{2}:\d{2}:\d{2}),(\d{3})/g, '$1.$2');
+
+                const trackBlob = new Blob([vttContent], { type: 'text/vtt' });
+                const trackURL = URL.createObjectURL(trackBlob);
+                currentSubtitleBlobUrl = trackURL;
+
+                const trackElement = document.createElement('track');
+                trackElement.kind = 'subtitles';
+                trackElement.label = 'Legendas';
+                trackElement.srclang = 'pt';
+                trackElement.src = trackURL;
+                trackElement.default = true;
+                videoPlayer.appendChild(trackElement);
+
+                updateStatus(`Legenda "${file.name}" carregada.`);
+                checkIfReadyToPlay();
+            };
+
+            reader.onerror = function(e) {
+                updateStatus(`Erro ao ler o arquivo de legenda: ${e.target.error}`);
+            };
+
+            reader.readAsText(file, 'UTF-8');
+        }
+
+        function updateStatus(message) {
+            statusMessage.textContent = message;
+        }
+
+        function checkIfReadyToPlay() {
+            if (videoPlayer.src && videoPlayer.textTracks.length > 0) {
+                updateStatus("Tudo pronto! Pressione play para começar.");
+            } else if (videoPlayer.src) {
+                // Status customizado para quando falta a legenda
+            } else {
+                // Status customizado para o estado inicial
+            }
+        }
+
+        videoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                loadVideo(file);
+            }
+        });
+
+        subtitleInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                loadSubtitle(file);
+            }
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (currentVideoBlobUrl) URL.revokeObjectURL(currentVideoBlobUrl);
+            if (currentSubtitleBlobUrl) URL.revokeObjectURL(currentSubtitleBlobUrl);
+        });
+        
+        // Inicializa a mensagem de status ao carregar a página
+        updateStatus("Por favor, selecione um arquivo de vídeo e um arquivo de legenda.");
+    </script>
+
+</body>
+</html>
+
