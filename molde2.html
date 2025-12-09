@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tabela de Credenciais - Tema Escuro</title>
+    <style>
+        /* CSS para TEMA ESCURO */
+        body {
+            background-color: #121212; /* Fundo muito escuro */
+            color: #e0e0e0; /* Texto claro */
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #bb86fc; /* Cor de destaque (roxo) */
+            text-align: center;
+        }
+
+        /* CSS para a Tabela */
+        .tabela-credenciais {
+            width: 90%; 
+            max-width: 800px;
+            margin: 20px auto;
+            table-layout: fixed;
+            border-collapse: collapse;
+        }
+
+        .tabela-credenciais th, .tabela-credenciais td {
+            padding: 10px;
+            border: 1px solid #333; /* Borda escura */
+            /* Sugestão de Fontes Monoespaçadas */
+            font-family: 'Consolas', 'Menlo', 'Courier New', monospace;
+        }
+
+        .tabela-credenciais th {
+            background-color: #1f1f1f;
+            color: #03dac6; /* Cor de destaque para cabeçalho */
+            text-align: center;
+        }
+
+        .tabela-credenciais td {
+            text-align: center;
+        }
+
+        /* Estilos de Largura */
+        .tabela-credenciais .coluna-aluno {
+            width: 40%; 
+            text-align: left;
+        }
+
+        .tabela-credenciais td:nth-child(2) {
+            display: flex; /* Permite que o Login e o Botão fiquem lado a lado */
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Botão de Cópia */
+        .copy-btn {
+            background-color: #bb86fc; 
+            color: #121212;
+            border: none;
+            padding: 4px 8px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 10px;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .copy-btn:hover {
+            background-color: #3700b3;
+            color: #e0e0e0;
+        }
+
+        /* Modal de Confirmação */
+        .modal {
+            display: none; /* Oculto por padrão */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #03dac6; /* Destaque */
+            color: #121212;
+            padding: 15px 30px;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            font-weight: bold;
+            z-index: 1000;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Lista de Credenciais dos Alunos</h1>
+
+    <table class="tabela-credenciais">
+        <thead>
+            <tr>
+                <th class="coluna-aluno">Aluno</th>
+                <th>Login (jpi99999)</th>
+                <th>Senha (password)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr><td class="coluna-aluno">Aluno 01</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 02</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 03</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 04</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 05</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 06</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 07</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 08</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 09</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 10</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 11</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 12</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 13</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 14</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 15</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 16</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 17</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 18</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 19</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 20</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 21</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 22</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 23</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 24</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+            <tr><td class="coluna-aluno">Aluno 25</td><td><span>jpi99999</span><button class="copy-btn" onclick="copyLogin('jpi99999')">Copiar</button></td><td>password</td></tr>
+        </tbody>
+    </table>
+
+    <div id="copyModal" class="modal">
+        Login jpi99999 Copiado!
+    </div>
+
+    <script>
+        /**
+         * Função JavaScript para Copiar o Login para a Área de Transferência
+         */
+        function copyLogin(textToCopy) {
+            const modal = document.getElementById('copyModal');
+            
+            // 1. Copia o texto para a área de transferência
+            // O uso de navigator.clipboard.writeText() é moderno e recomendado
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                
+                // 2. Exibe o modal de sucesso
+                modal.style.display = 'block';
+
+                // 3. Oculta o modal após 1.5 segundos
+                setTimeout(() => {
+                    modal.style.display = 'none';
+                }, 1500);
+
+            }).catch(err => {
+                // Em caso de erro (ex: navegador antigo ou permissão negada)
+                console.error('Falha ao copiar:', err);
+                alert('Erro ao tentar copiar o login. Tente novamente.');
+            });
+        }
+    </script>
+
+</body>
+</html>
