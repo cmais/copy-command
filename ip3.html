@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seu IP, País e Cidade</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --text-color: #e0e0e0;
+            --accent-color: #4da6ff;
+            --card-bg: #1e1e1e;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+            transition: all 0.3s ease;
+        }
+        h1 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: var(--accent-color);
+            text-align: center;
+        }
+        p {
+            font-size: 1em;
+            margin-bottom: 10px;
+        }
+        #info {
+            background: var(--card-bg);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+            transition: opacity 0.3s ease;
+        }
+        #info.loading {
+            opacity: 0.7;
+            font-style: italic;
+            color: #888;
+        }
+        #info h3 {
+            margin-top: 0;
+            color: var(--accent-color);
+        }
+        #info strong {
+            color: #ffffff;
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --text-color: #e0e0e0;
+            }
+        }
+    </style>
+</head>
+<body onload="getLocation()">
+    <h1>Detectando sua localização por IP</h1>
+    <p>Carregando automaticamente seu IP público, país, cidade e mais...</p>
+    <div id="info" class="loading">Buscando informações...</div>
+
+    <script>
+        async function getLocation() {
+            const infoDiv = document.getElementById('info');
+            infoDiv.innerHTML = 'Buscando seu IP...';
+            infoDiv.classList.add('loading');
+
+            const apis = [
+                'https://ipapi.co/json/',
+                'https://ipwho.is/',
+                'https://api.ipify.org?format=json',
+            ];
+
+            let data = null;
+
+            for (let api of apis) {
+                try {
+                    const response = await fetch(api, { 
+                        cache: 'no-store',
+                        mode: 'cors'
+                    });
+                    
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    
+                    if (api.includes('ipify.org')) {
+                        const ipData = await response.json();
+                        data = { ip: ipData.ip, country_name: 'Desconhecido', city: 'Desconhecido' };
+                    } else {
+                        data = await response.json();
+                    }
+                    
+                    console.log('Funcionou com:', api);
+                    break;
+                } catch (err) {
+                    console.log('Falhou com', api, err);
+                    continue;
+                }
+            }
+
+            infoDiv.classList.remove('loading');
+            infoDiv.style.opacity = 1;
+
+            if (data && data.ip) {
+                infoDiv.innerHTML = `
+                    <h3>Seu IP público: <strong>${data.ip || 'Não detectado'}</strong></h3>
+                    <p><strong>País:</strong> ${data.country_name || data.country || 'Desconhecido'} (${data.country_code || '--'})</p>
+                    <p><strong>Cidade:</strong> ${data.city || 'Desconhecida'}</p>
+                    <p><strong>Região:</strong> ${data.region || 'Desconhecida'}</p>
+                    <p><strong>Provedor/ISP:</strong> ${data.org || data.isp || 'Não informado'}</p>
+                    <p><strong>Latitude/Longitude:</strong> ${data.latitude || '?'} / ${data.longitude || '?'}</p>
+                `;
+            } else {
+                infoDiv.innerHTML = '<strong style="color:#ff4d4d;">Não foi possível obter os dados.</strong><br>Tente hospedar online ou verifique a conexão.';
+            }
+        }
+    </script>
+</body>
+</html>
