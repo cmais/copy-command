@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Lista de Credenciais - Tema Escuro (Exemplo Dinâmico)</title>
+    <style>
+        :root{
+            --bg: #121212;
+            --muted-bg: #1f1f1f;
+            --text: #e0e0e0;
+            --accent: #bb86fc;
+            --accent-strong: #3700b3;
+            --accent-cta: #03dac6;
+            --border: #2a2a2a;
+            --toast-bg: #03dac6;
+            --toast-text: #121212;
+            --radius: 6px;
+        }
+
+        html,body{height:100%;margin:0}
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            padding: 20px;
+            -webkit-font-smoothing:antialiased;
+        }
+
+        h1 { color: var(--accent); text-align:center; margin:0 0 12px 0; }
+
+        .notice {
+            max-width:1000px;
+            margin: 0 auto 16px;
+            color: #ffcc66;
+        }
+
+        .table-wrap {
+            width:100%;
+            max-width:1000px;
+            margin:0 auto;
+            overflow-x:auto;
+            padding:8px 0;
+        }
+
+        table.tabela-credenciais {
+            width:100%;
+            border-collapse:collapse;
+            min-width:640px;
+        }
+
+        .tabela-credenciais caption{
+            caption-side: top;
+            text-align:left;
+            font-weight:700;
+            color:var(--accent-cta);
+            padding-bottom:8px;
+        }
+
+        .tabela-credenciais th,
+        .tabela-credenciais td {
+            padding:10px;
+            border:1px solid var(--border);
+            font-family: 'Consolas','Menlo','Courier New',monospace;
+            font-size:14px;
+        }
+
+        .tabela-credenciais th{
+            background:var(--muted-bg);
+            color:var(--accent-cta);
+            text-align:center;
+        }
+
+        .coluna-aluno { text-align:left; width:40%; font-weight:600; color:var(--text); }
+
+        .login-cell {
+            display:flex;
+            gap:8px;
+            align-items:center;
+            justify-content:space-between;
+        }
+
+        .login-text {
+            flex:1 1 auto;
+            text-align:left;
+            overflow:hidden;
+            text-overflow:ellipsis;
+            white-space:nowrap;
+        }
+
+        .copy-btn {
+            background:var(--accent);
+            color:var(--bg);
+            border:0;
+            padding:6px 10px;
+            border-radius:4px;
+            cursor:pointer;
+            font-weight:700;
+            font-size:13px;
+        }
+        .copy-btn:hover, .copy-btn:focus {
+            background:var(--accent-strong);
+            outline: 2px solid rgba(255,255,255,0.06);
+        }
+
+        .toast {
+            position:fixed;
+            left:50%;
+            bottom:24px;
+            transform:translateX(-50%);
+            background:var(--toast-bg);
+            color:var(--toast-text);
+            padding:10px 14px;
+            border-radius:var(--radius);
+            box-shadow:0 6px 18px rgba(0,0,0,0.4);
+            display:none;
+            z-index:10000;
+            font-weight:700;
+        }
+        .toast.show { display:block; animation:toast-in 200ms ease; }
+        @keyframes toast-in { from { opacity:0; transform:translateX(-50%) translateY(8px);} to { opacity:1; transform:translateX(-50%) translateY(0);} }
+
+        .sr-only {
+            position:absolute!important;
+            height:1px; width:1px;
+            overflow:hidden;
+            clip:rect(1px,1px,1px,1px);
+            white-space:nowrap;
+        }
+
+        @media (max-width:480px) {
+            .tabela-credenciais th, .tabela-credenciais td { padding:8px; font-size:13px; }
+            .copy-btn { padding:6px 8px; font-size:12px; }
+        }
+    </style>
+</head>
+<body>
+    <h1>Lista de Credenciais dos Alunos (Exemplo)</h1>
+
+    <p class="notice">
+        <strong>Aviso:</strong> este é um exemplo. NÃO coloque credenciais reais em repositórios públicos. Use placeholders ou gere credenciais dinamicamente a partir de uma fonte segura.
+    </p>
+
+    <div class="table-wrap" role="region" aria-label="Tabela de credenciais dos alunos">
+        <table class="tabela-credenciais" aria-describedby="table-desc" id="cred-table">
+            <caption>Logins e senhas (exemplo)</caption>
+            <thead>
+                <tr>
+                    <th scope="col" class="coluna-aluno">Aluno</th>
+                    <th scope="col">Login (ex: jpi99999)</th>
+                    <th scope="col">Senha (ex: ********)</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-credenciais">
+                <!-- conteúdo gerado via JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <div id="toast" class="toast" role="status" aria-live="polite">Copiado para a área de transferência</div>
+
+    <script>
+        // Exemplo de dados (substitua por fetch() para carregar de uma API segura)
+        // IMPORTANTE: NÃO versionar credenciais reais
+        const dadosExemplo = [
+            { aluno: 'Aluno 01', login: 'jpi99901', senha: 'password01' },
+            { aluno: 'Aluno 02', login: 'jpi99902', senha: 'password02' },
+            { aluno: 'Aluno 03', login: 'jpi99903', senha: 'password03' },
+            { aluno: 'Aluno 04', login: 'jpi99904', senha: 'password04' },
+            { aluno: 'Aluno 05', login: 'jpi99905', senha: 'password05' },
+            { aluno: 'Aluno 06', login: 'jpi99906', senha: 'password06' },
+            { aluno: 'Aluno 07', login: 'jpi99907', senha: 'password07' },
+            { aluno: 'Aluno 08', login: 'jpi99908', senha: 'password08' },
+            { aluno: 'Aluno 09', login: 'jpi99909', senha: 'password09' },
+            { aluno: 'Aluno 10', login: 'jpi99910', senha: 'password10' },
+            { aluno: 'Aluno 11', login: 'jpi99911', senha: 'password11' },
+            { aluno: 'Aluno 12', login: 'jpi99912', senha: 'password12' },
+            { aluno: 'Aluno 13', login: 'jpi99913', senha: 'password13' },
+            { aluno: 'Aluno 14', login: 'jpi99914', senha: 'password14' },
+            { aluno: 'Aluno 15', login: 'jpi99915', senha: 'password15' },
+            { aluno: 'Aluno 16', login: 'jpi99916', senha: 'password16' },
+            { aluno: 'Aluno 17', login: 'jpi99917', senha: 'password17' },
+            { aluno: 'Aluno 18', login: 'jpi99918', senha: 'password18' },
+            { aluno: 'Aluno 19', login: 'jpi99919', senha: 'password19' },
+            { aluno: 'Aluno 20', login: 'jpi99920', senha: 'password20' },
+            { aluno: 'Aluno 21', login: 'jpi99921', senha: 'password21' },
+            { aluno: 'Aluno 22', login: 'jpi99922', senha: 'password22' },
+            { aluno: 'Aluno 23', login: 'jpi99923', senha: 'password23' },
+            { aluno: 'Aluno 24', login: 'jpi99924', senha: 'password24' },
+            { aluno: 'Aluno 25', login: 'jpi99925', senha: 'password25' }
+        ];
+
+        // Gera linhas da tabela a partir de dados
+        function popularTabela(dados) {
+            const tbody = document.getElementById('tbody-credenciais');
+            tbody.innerHTML = ''; // limpar antes de popular
+
+            dados.forEach((item, idx) => {
+                const tr = document.createElement('tr');
+
+                // Coluna Aluno
+                const tdAluno = document.createElement('td');
+                tdAluno.className = 'coluna-aluno';
+                tdAluno.textContent = item.aluno;
+                tr.appendChild(tdAluno);
+
+                // Coluna Login (texto + botão)
+                const tdLogin = document.createElement('td');
+                const wrapper = document.createElement('div');
+                wrapper.className = 'login-cell';
+
+                const spanLogin = document.createElement('span');
+                spanLogin.className = 'login-text';
+                spanLogin.textContent = item.login;
+                // data-login é fonte de verdade para o valor a copiar
+                spanLogin.dataset.login = item.login;
+
+                const btnCopy = document.createElement('button');
+                btnCopy.type = 'button';
+                btnCopy.className = 'copy-btn';
+                btnCopy.textContent = 'Copiar';
+                btnCopy.setAttribute('aria-label', `Copiar login do ${item.aluno}`);
+                // não adicionamos handler inline; delegação irá capturar
+
+                wrapper.appendChild(spanLogin);
+                wrapper.appendChild(btnCopy);
+                tdLogin.appendChild(wrapper);
+                tr.appendChild(tdLogin);
+
+                // Coluna Senha (mascarada) - evitar mostrar senha real
+                const tdSenha = document.createElement('td');
+                // mostrar apenas placeholders/mascara. Se precisar mostrar a senha real,
+                // prefira um fluxo seguro (ex: solicitar confirmação, registrar acesso).
+                const senhaSpan = document.createElement('span');
+                senhaSpan.setAttribute('aria-hidden', 'true');
+                senhaSpan.textContent = '********';
+                tdSenha.appendChild(senhaSpan);
+
+                // adicionar uma indicação apenas para leitores de tela (não expõe a senha)
+                const sr = document.createElement('span');
+                sr.className = 'sr-only';
+                sr.textContent = 'Senha protegida';
+                tdSenha.appendChild(sr);
+
+                tr.appendChild(tdSenha);
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Inicializa tabela com dados de exemplo
+        popularTabela(dadosExemplo);
+
+        // Delegação de eventos - captura todos os cliques em botões "copy-btn"
+        document.addEventListener('click', function (event) {
+            const btn = event.target.closest('.copy-btn');
+            if (!btn) return;
+            const row = btn.closest('tr');
+            if (!row) return;
+
+            const loginSpan = row.querySelector('.login-text');
+            const loginVal = loginSpan ? (loginSpan.dataset.login || loginSpan.textContent.trim()) : null;
+            if (!loginVal) {
+                // fallback simples
+                alert('Não foi possível obter o login para copiar.');
+                return;
+            }
+            copyLogin(loginVal, btn);
+        });
+
+        // Função que tenta copiar usando Clipboard API com fallback
+        function copyLogin(textToCopy, triggeringButton) {
+            const toast = document.getElementById('toast');
+
+            const showToast = (msg) => {
+                toast.textContent = msg;
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 1500);
+            };
+
+            // Feedback imediato no botão
+            const original = triggeringButton.innerHTML;
+            triggeringButton.textContent = 'Copiado!';
+            triggeringButton.setAttribute('aria-pressed', 'true');
+            setTimeout(() => {
+                triggeringButton.innerHTML = original;
+                triggeringButton.removeAttribute('aria-pressed');
+            }, 1400);
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    showToast('Login copiado: ' + textToCopy);
+                }).catch(() => {
+                    fallbackCopyTextToClipboard(textToCopy, showToast);
+                });
+            } else {
+                fallbackCopyTextToClipboard(textToCopy, showToast);
+            }
+        }
+
+        // Fallback para navegadores antigos
+        function fallbackCopyTextToClipboard(text, onSuccess) {
+            try {
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                textarea.style.position = 'fixed';
+                textarea.style.left = '-9999px';
+                document.body.appendChild(textarea);
+                textarea.focus();
+                textarea.select();
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textarea);
+
+                if (successful) {
+                    onSuccess('Login copiado');
+                } else {
+                    throw new Error('execCommand falhou');
+                }
+            } catch (err) {
+                console.error('Falha ao copiar:', err);
+                alert('Erro ao tentar copiar o login. Verifique as permissões do navegador.');
+            }
+        }
+
+        // Sugestão: caso deseje carregar dados reais via API:
+        // fetch('/api/credenciais')
+        //   .then(r => r.json())
+        //   .then(data => popularTabela(data))
+        //   .catch(err => console.error(err));
+    </script>
+</body>
+</html>
