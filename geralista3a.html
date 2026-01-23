@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Gerenciador de Acessos</title>
+    <style id="estilo-principal">
+        :root{
+            --bg: #121212;
+            --muted-bg: #1f1f1f;
+            --text: #e0e0e0;
+            --accent: #0ea5e9; 
+            --accent-strong: #0284c7;
+            --accent-cta: #38bdf8;
+            --border: #2a2a2a;
+            --toast-bg: #0ea5e9;
+            --toast-text: #ffffff;
+            --radius: 6px;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: system-ui, -apple-system, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+
+        h1 { 
+            color: var(--accent); 
+            text-align: center; 
+            margin-bottom: 20px; 
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .no-export { margin-bottom: 20px; }
+
+        #painel-importacao {
+            background: var(--muted-bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+        }
+
+        .campo-grupo { margin-bottom: 15px; }
+        
+        label { display: block; margin-bottom: 5px; font-size: 12px; color: var(--accent-cta); font-weight: bold; text-transform: uppercase; }
+
+        input[type="text"], textarea {
+            width: 100%;
+            background: #000; color: #22c55e;
+            border: 1px solid var(--border);
+            padding: 10px; font-family: 'Consolas', monospace;
+            box-sizing: border-box;
+            border-radius: 4px;
+        }
+
+        .btn-group { margin-top: 15px; display: flex; gap: 10px; }
+
+        .btn {
+            padding: 12px 20px; border-radius: 4px; border: none;
+            cursor: pointer; font-weight: bold; font-size: 11px;
+            text-transform: uppercase; transition: opacity 0.2s;
+        }
+        .btn:hover { opacity: 0.9; }
+
+        .btn-primary { background: var(--accent); color: white; }
+        .btn-export { background: #10b981; color: white; }
+
+        /* Tabela Institucional */
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; margin-top: 10px; }
+        th { 
+            background: var(--muted-bg); color: var(--accent-cta); 
+            padding: 12px; border: 1px solid var(--border); 
+            text-transform: uppercase; font-size: 12px; 
+        }
+        td { padding: 12px; border: 1px solid var(--border); font-size: 14px; }
+
+        .coluna-aluno { 
+            font-family: 'Verdana', Geneva, sans-serif; 
+            text-transform: uppercase; font-weight: 600; 
+        }
+
+        .login-cell { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .copy-btn {
+            background: var(--accent); color: white; border: none;
+            padding: 6px 12px; border-radius: 3px; cursor: pointer; font-size: 10px;
+            text-transform: uppercase; font-weight: bold;
+        }
+        .copy-btn:hover { background: var(--accent-strong); }
+
+        .toast {
+            position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+            background: var(--toast-bg); color: white; padding: 10px 20px;
+            border-radius: 20px; display: none; font-weight: bold; z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1 id="titulo-pagina">Lista de Credenciais</h1>
+
+    <div id="painel-importacao" class="no-export">
+        <div class="campo-grupo">
+            <label for="nome-turma">Nome da Turma:</label>
+            <input type="text" id="nome-turma" placeholder="Ex: 2º ANO A - INFORMÁTICA" oninput="atualizarTituloLive()">
+        </div>
+        
+        <div class="campo-grupo">
+            <label for="entrada-dados">Dados da Planilha (Nome | Login | Senha):</label>
+            <textarea id="entrada-dados" rows="6" placeholder="Dica: Copie as colunas do Excel e cole aqui..."></textarea>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="importarDados()">1. Visualizar Tabela</button>
+            <button class="btn btn-export" onclick="exportarHTML()">2. Exportar HTML para Alunos</button>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Aluno</th>
+                    <th>Login</th>
+                    <th>Senha</th>
+                </tr>
+            </thead>
+            <tbody id="corpo-tabela"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="toast" class="toast">Copiado!</div>
+
+<script id="script-util">
+    function atualizarTituloLive() {
+        const nome = document.getElementById('nome-turma').value;
+        document.getElementById('titulo-pagina').innerText = nome || "Lista de Credenciais";
+    }
+
+    // Função de Cópia Robusta (Funciona em HTTPS, Intranet e Local)
+    function copiar(texto) {
+        if (!texto) return;
+
+        const realizarCopia = () => {
+            const t = document.getElementById('toast');
+            t.style.display = 'block';
+            setTimeout(() => t.style.display = 'none', 1200);
+        };
+
+        // Tenta API Moderna
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(texto).then(realizarCopia).catch(() => fallbackCopia(texto, realizarCopia));
+        } else {
+            fallbackCopia(texto, realizarCopia);
+        }
+    }
+
+    function fallbackCopia(texto, callback) {
+        const textArea = document.createElement("textarea");
+        textArea.value = texto;
+        textArea.style.position = "fixed"; // Evita scroll
+        textArea.style.left = "-9999px";
+        textArea.style.top = "0";
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        try {
+            const status = document.execCommand('copy');
+            if (status) callback();
+        } catch (err) {
+            console.error('Falha no fallback de cópia', err);
+        }
+        document.body.removeChild(textArea);
+    }
+
+    function importarDados() {
+        const rawData = document.getElementById('entrada-dados').value;
+        const corpoTabela = document.getElementById('corpo-tabela');
+        corpoTabela.innerHTML = '';
+
+        if (!rawData.trim()) return;
+
+        rawData.split('\n').forEach(linha => {
+            if (!linha.trim()) return;
+            const colunas = linha.split(/\t/); 
+            const nome = (colunas[0] || "").trim();
+            const login = (colunas[1] || "").trim();
+            const senha = (colunas[2] || "").trim();
+
+            if (!nome && !login) return;
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="coluna-aluno"></td>
+                <td>
+                    <div class="login-cell">
+                        <span class="txt-login"></span>
+                        <button class="copy-btn">Copiar</button>
+                    </div>
+                </td>
+                <td style="text-align:center; color:#666; font-family:monospace;" class="txt-senha"></td>
+            `;
+
+            // Proteção contra XSS e caracteres especiais
+            tr.querySelector('.coluna-aluno').textContent = nome;
+            tr.querySelector('.txt-login').textContent = login;
+            tr.querySelector('.txt-senha').textContent = senha;
+            
+            // Atribui o clique de forma segura
+            tr.querySelector('.copy-btn').onclick = () => copiar(login);
+
+            corpoTabela.appendChild(tr);
+        });
+    }
+
+    function exportarHTML() {
+        const turma = document.getElementById('nome-turma').value.trim() || "lista_credenciais";
+        const filename = turma.toLowerCase().replace(/\s+/g, '_') + '.html';
+        
+        // Clona o documento
+        const clone = document.documentElement.cloneNode(true);
+        
+        // Remove painel de importação
+        clone.querySelectorAll('.no-export').forEach(el => el.remove());
+        
+        // Ajusta o título
+        clone.querySelector('#titulo-pagina').innerText = turma.toUpperCase();
+
+        // Injeta o script de cópia no arquivo final para que os botões funcionem
+        const scriptFinal = clone.querySelector('#script-util');
+        
+        // Aqui garantimos que a função 'copiar' e seu 'fallback' existam no arquivo do aluno
+        scriptFinal.innerHTML = `
+            function copiar(texto) {
+                const realizarCopia = () => {
+                    const t = document.getElementById('toast');
+                    t.style.display = 'block';
+                    setTimeout(() => t.style.display = 'none', 1200);
+                };
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(texto).then(realizarCopia).catch(() => fallbackCopia(texto, realizarCopia));
+                } else {
+                    fallbackCopia(texto, realizarCopia);
+                }
+            }
+
+            function fallbackCopia(texto, callback) {
+                const textArea = document.createElement("textarea");
+                textArea.value = texto;
+                textArea.style.position = "fixed";
+                textArea.style.left = "-9999px";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try { document.execCommand('copy'); callback(); } catch (err) {}
+                document.body.removeChild(textArea);
+            }
+
+            // Reatribui os eventos de clique que se perdem na clonagem de strings
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                const loginText = btn.previousElementSibling.textContent;
+                btn.onclick = () => copiar(loginText);
+            });
+        `;
+
+        const htmlContent = '<!DOCTYPE html>\n' + clone.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
+        link.click();
+    }
+</script>
+
+</body>
+</html>
